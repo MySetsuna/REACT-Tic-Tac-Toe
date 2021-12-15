@@ -1,0 +1,8 @@
+{
+  "name": "jxk2g1",
+  "description": "我和宝宝的故事",
+  "repository": "https://github.com/heroku/node-js-getting-started",
+  "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/main/public/node.svg",
+  "keywords": ["node", "express", "heroku"],
+  "image": "heroku/nodejs"
+}
