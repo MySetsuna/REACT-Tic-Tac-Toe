@@ -27,7 +27,7 @@ Component<PropsType,StateType>*/
         )
     }
 }*/
-function Square(props: any) {
+function Square(props: { value: string, style: object, onClick: any }) {
     return (
         <button className="square" style={props.style} onClick={props.onClick}>
             {props.value}
@@ -40,7 +40,7 @@ class Board extends Component<{ squares: string[], onClick: any, winLine: number
     renderSquare(i: number) {
         const winnerHeightLineCss = {backgroundColor: 'yellow'};
         return <Square key={i}
-                       style={this.props.winLine.indexOf(i) > -1 ? winnerHeightLineCss : {}}
+                       style={this.props.winLine && this.props.winLine.indexOf(i) > -1 ? winnerHeightLineCss : {}}
                        value={this.props.squares[i]}
                        onClick={() => this.props.onClick(i)}/>;
     }
@@ -100,11 +100,18 @@ class Game extends Component<object, StateType> {
         ]
     }
 
-    getWinLine(squares: number[]) {
+    getWinLine(squares: string[]) {
+        let count = 1;
         for (let i = 0; i < this.lines.length; i++) {
             const [a, b, c] = this.lines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 return this.lines[i];
+            }
+            if (squares[a] && squares[b] && squares[c]) {
+                count++;
+                if(count===this.lines.length){
+                    return null;
+                }
             }
         }
         return [];
@@ -115,7 +122,7 @@ class Game extends Component<object, StateType> {
         const current = history[history.length - 1];
         const squares = current.squares.slice();
         const winLine = this.getWinLine(squares);
-        if (winLine.length > 0 || squares[i]) {
+        if ((winLine && winLine.length > 0) || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -123,6 +130,7 @@ class Game extends Component<object, StateType> {
             history: history.concat([{
                 squares: squares,
                 number: i,
+                winLine: winLine
             }]),
             move: 0,
             stepNumber: history.length,
@@ -140,10 +148,13 @@ class Game extends Component<object, StateType> {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winLine = this.getWinLine(current.squares)
+        const winLine = this.getWinLine(current.squares);
         let winner;
-        if (winLine.length > 0) {
-            winner = winLine[current.squares[0]];
+        if (winLine && winLine.length > 0) {
+            winner=current.squares[winLine[0]];
+        }
+        if (!winLine) {
+            winner = 'No Winner'
         }
 
         let historyCopy = history;
@@ -199,7 +210,6 @@ class Game extends Component<object, StateType> {
 
         let status;
         if (winner) {
-
             status = 'Winner: ' + winner;
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
