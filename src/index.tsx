@@ -29,7 +29,7 @@ Component<PropsType,StateType>*/
 }*/
 function Square(props: any) {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button className="square" style={props.style} onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -70,27 +70,25 @@ type StateType = {
     move: number,
     sortAsc: boolean,
     xIsNext: boolean,
-    winLine: number[]
 }
 
 class Game extends Component<object, StateType> {
+    lines: any[];
+
     constructor(props: any) {
         super(props);
         this.state = {
             history: [{
                 squares: Array(9).fill(null),
                 number: 0,
+                winLine: []
             }],
             move: 0,
             sortAsc: true,
             stepNumber: 0,
             xIsNext: true,
-            winLine: [],
         };
-    }
-
-    calculateWinner(squares: string[]) {
-        const lines = [
+        this.lines = [
             [0, 1, 2],
             [3, 4, 5],
             [6, 7, 8],
@@ -99,22 +97,25 @@ class Game extends Component<object, StateType> {
             [2, 5, 8],
             [0, 4, 8],
             [2, 4, 6],
-        ];
-        for (let i = 0; i < lines.length; i++) {
-            const [a, b, c] = lines[i];
+        ]
+    }
+
+    getWinLine(squares: number[]) {
+        for (let i = 0; i < this.lines.length; i++) {
+            const [a, b, c] = this.lines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                this.setState({winLine: lines[i]});
-                return squares[a];
+                return this.lines[i];
             }
         }
-        return null;
+        return [];
     }
 
     handleClick(i: number) {
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
-        if (this.calculateWinner(squares) || squares[i]) {
+        const winLine = this.getWinLine(squares);
+        if (winLine.length > 0 || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -139,7 +140,11 @@ class Game extends Component<object, StateType> {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winner = this.calculateWinner(current.squares);
+        const winLine = this.getWinLine(current.squares)
+        let winner;
+        if (winLine.length > 0) {
+            winner = winLine[current.squares[0]];
+        }
 
         let historyCopy = history;
         if (!this.state.sortAsc) {
@@ -194,6 +199,7 @@ class Game extends Component<object, StateType> {
 
         let status;
         if (winner) {
+
             status = 'Winner: ' + winner;
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
@@ -204,7 +210,7 @@ class Game extends Component<object, StateType> {
                 <div className="game-board">
                     <Board
                         squares={current.squares}
-                        winLine={this.state.winLine}
+                        winLine={winLine}
                         onClick={(i: number) => this.handleClick(i)}
                     />
                 </div>
