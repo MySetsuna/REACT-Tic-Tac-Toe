@@ -109,7 +109,7 @@ class Game extends Component<object, StateType> {
             }
             if (squares[a] && squares[b] && squares[c]) {
                 count++;
-                if(count===this.lines.length){
+                if (count === this.lines.length) {
                     return null;
                 }
             }
@@ -118,14 +118,15 @@ class Game extends Component<object, StateType> {
     }
 
     handleClick(i: number) {
-        const history = this.state.history.slice(0, this.state.stepNumber + 1);
-        const current = history[history.length - 1];
+        const history = this.state.history.slice();
+        const current = history[this.state.stepNumber];
         const squares = current.squares.slice();
-        const winLine = this.getWinLine(squares);
-        if ((winLine && winLine.length > 0) || squares[i]) {
+        let winLine = current.winLine;
+        if (!winLine || (winLine && winLine.length > 0) || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
+        winLine = this.getWinLine(squares);
         this.setState({
             history: history.concat([{
                 squares: squares,
@@ -148,10 +149,10 @@ class Game extends Component<object, StateType> {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winLine = this.getWinLine(current.squares);
+        const winLine = current.winLine;
         let winner;
         if (winLine && winLine.length > 0) {
-            winner=current.squares[winLine[0]];
+            winner = current.squares[winLine[0]];
         }
         if (!winLine) {
             winner = 'No Winner'
