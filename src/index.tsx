@@ -101,13 +101,13 @@ class Game extends Component<object, StateType> {
     }
 
     getWinLine(squares: string[]) {
-        let count = 1;
+        let count = 0;
         for (let i = 0; i < this.lines.length; i++) {
             const [a, b, c] = this.lines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 return this.lines[i];
             }
-            if ((squares[a] && squares[b]) || (squares[a] && squares[c]) || (squares[b] && squares[c])) {
+            if (squares[a] && squares[b] && squares[c] ) {
                 count++;
                 if (count === this.lines.length) {
                     return null;
@@ -118,7 +118,7 @@ class Game extends Component<object, StateType> {
     }
 
     handleClick(i: number) {
-        const history = this.state.history.slice();
+        const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[this.state.stepNumber];
         const squares = current.squares.slice();
         let winLine = current.winLine;
