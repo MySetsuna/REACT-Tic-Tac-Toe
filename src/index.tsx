@@ -107,7 +107,7 @@ class Game extends Component<object, StateType> {
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 return this.lines[i];
             }
-            if (squares[a] && squares[b] && squares[c]) {
+            if ((squares[a] && squares[b]) || (squares[a] && squares[c]) || (squares[b] && squares[c])) {
                 count++;
                 if (count === this.lines.length) {
                     return null;
